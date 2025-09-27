@@ -1,0 +1,66 @@
+/* mobile */
+@media screen and (max-width: 767px) {
+    .header {
+        height: 5rem;
+    }
+    .logo_main {
+        width: 5rem;
+    }
+    .header__main {
+        display: none;
+    }
+    .icon__dash{
+        display: block;
+        color: #fff;
+        font-size: 3rem;
+    }
+    .icon__dash:hover {
+        color: red;
+        cursor: pointer;
+    }
+    .block__logOut__wrap {
+        right: 15%;
+        bottom: 50%;
+        z-index: 1;
+    }
+    .block__signUp {
+        right: 2%;
+    }
+    .block__login{
+        right: 13%;
+    }
+}
+/* tablet */
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    .header {
+        height: 6rem;
+    }
+    .logo_main {
+        width: 6rem;
+    }
+    .header__main {
+        display: none;
+    }
+    .icon__dash{
+        display: block;
+        color: #fff;
+        font-size: 4rem;
+    }
+    .icon__dash:hover {
+        color: red;
+        cursor: pointer;
+    }
+    .block__logOut__wrap {
+        right: 30%;
+        bottom: 50%;
+        z-index: 1;
+    }
+    .block__signUp {
+        right: 23%;
+    }
+    .block__login{
+        right: 30%;
+    }
+    
+
+}

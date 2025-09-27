@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Task</title>
+    <link rel="icon" href="{% static 'img/logo.svg' %}" style="background-color: #000;">
+
+    <!-- reset css -->
+    <link rel="stylesheet" href="{% static 'css/resset.css' %}">
+    <!-- common -->
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <!-- font text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500&display=swap"
+        rel="stylesheet">
+    <!-- header / footer -->
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+    <!-- page riêng -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- responsive -->
+    <link rel="stylesheet" href="{% static 'css/footerResponsive.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headerResponsive.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homeResponsive.css' %}">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    {% include "partials/navbar.html" %}
+
+    <!-- Nội dung riêng -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include "partials/footer.html" %}
+
+    <!-- JS -->
+    <script src="{% static 'js/SignIn.js' %}"></script>
+    <script type="module" src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let name = JSON.parse(localStorage.getItem("name"));
+            let adminNavItem = document.getElementById("admin");
+            if (name !== "ADMIN") {
+                adminNavItem.style.display = "none";
+            } else {
+                adminNavItem.style.display = "block";
+            }
+        });
+    </script>
+    <script type="module" src="{% static 'js/ManagerProduct.js' %}"></script>
+</body>
+
+</html>
