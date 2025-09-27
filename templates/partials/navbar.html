@@ -24,12 +24,20 @@
             <!-- sign in -->
             <div class="signIn">
                 <div class="signIn__wrap">
-                    <div class="logIn">Log In</div>
-                    <div class="signUp">
-                        <button class="signUp__btn btn">Sign Up</button>
-                    </div>
+                    {% if user.is_authenticated %}
+                        <span class="user__name">Hello, {{ user.username }}</span>
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn">Log Out</button>
+                        </form>
+
+                    {% else %}
+                        <a href="{% url 'login' %}" class="logIn">Log In</a>
+                        <a href="" class="signUp__btn btn">Sign Up</a>
+                    {% endif %}
                 </div>
             </div>
+
 
             <div class="user unactive">
                 <div class="user__wrap row">
