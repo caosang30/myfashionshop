@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Trang Quản Lý{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/management.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main class="main">
+        <div class="heading__manager content">
+            <ul class="container__manager row">
+                <li class="item__manager managerUser item__manager__active ">User</li>
+                <li class="item__manager managerProduct">Product</li>
+                <li class="item__manager managerOrder">Order</li>
+            </ul>
+        </div>
+
+        <!-- user -->
+        <div class="table__user table__wrap active">
+            <table class="table content">
+                <tr class="table__header_row">
+                    <th class="table__header_col">Name User</th>
+                    <th class="table__header_col">Phone</th>
+                    <th class="table__header_col">position</th>
+                    <th class="table__header_col">edit</th>
+                </tr>
+                <tbody class="listUsers">
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- product -->
+        <div class="table__Product table__wrap unactive">
+            <div class="content form__product">
+                <form action="" class="form_product__wrap">
+                    <div class="title__product">
+                        <h1 class="title__product__wrap">Management Product</h1>
+                    </div>
+                    <div class="form__group content">
+                        <label for="src">Product</label>
+                        <input type="text" name="src" id="src__product" class="form__control" placeholder="SRC:">
+                    </div>
+                    <div class="form__group content">
+                        <label for="name__product">Name Product</label>
+                        <input type="text" name="name__product" id="name__product" class="form__control"
+                               placeholder="Name Product:">
+                    </div>
+                    <div class="form__group content">
+                        <label for="price__product">Price Product</label>
+                        <input type="text" name="price__product" id="price__product" class="form__control"
+                               placeholder="Price">
+                    </div>
+                </form>
+                <div class="content btn__control__product">
+                    <button class="btn__add btn">Add Product</button>
+                    <button class="btn__edit btn">repair Product</button>
+                </div>
+            </div>
+            <div class="form__search content">
+                <input type="text" name="search__product" id="search__product" class="search__product"
+                       placeholder="Search" style="padding-left: 15px;">
+                <button class="btn__search btn">Search Product</button>
+            </div>
+            <table class="table content">
+                <tr class="table__header_row">
+                    <th class="table__header_col">ID</th>
+                    <th class="table__header_col">Product</th>
+                    <th class="table__header_col">Name</th>
+                    <th class="table__header_col">Price</th>
+                    <th class="table__header_col">edit</th>
+                </tr>
+                <tbody class="listProduct">
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- oder -->
+        <div class="table__order table__wrap unactive" onload="showOrdersList()">
+            <div class="search-order">
+                <div class="search-order-tittle">BẢNG TRA CỨU</div>
+                <div class="search-order-input">
+                    <input
+                            type="text"
+                            name="id-order"
+                            id="id-order"
+                            placeholder="Nhập mã đơn hàng"
+                    />
+                    <input type="date" name="date-order" id="date-order"/>
+                    <select name="date-around" id="date-around">
+                        <option value="7">Tuần này</option>
+                        <option value="30">Tháng này</option>
+                        <option value="365">Năm này</option>
+                    </select>
+                </div>
+                <button onclick="searchOrder()">Tra cứu</button>
+                <button onclick="statis(); updateStatis()">Bảng thống kê</button>
+            </div>
+            <div class="table__order--warning">(*)Nhấn Interupt sẽ xóa toàn bộ order</div>
+            <table class="table content table--order">
+                <tr class="table__header_row">
+                    <th class="table__header_col id-order">ID Order</th>
+                    <th class="table__header_col name-user">Name User</th>
+                    <th class="table__header_col info">Info</th>
+                    <th class="table__header_col price">Price</th>
+                    <th class="table__header_col date">Date</th>
+                    <th class="table__header_col accept">Accept</th>
+                    <th class="table__header_col interupt" onclick="interupt()">Interupt</th>
+                </tr>
+                <tbody class="listOrders">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="block__deletePoduct unactive">
+            <div class="block__deletePoduct__wrap">
+                <h1 class="block__deletePoduct__title">
+                    Do you want to Delete Product?
+                </h1>
+                <div class="btn__block__deletePoduct row content">
+                    <button class="btn__cancle__deletePoduct">Cancle</button>
+                    <button class="btn__deletePoduct">Delete</button>
+                </div>
+            </div>
+        </div>
+        <div class="statistics modal" style="display: none">
+            <div class="statis">
+                <div class="cancel-statis" onclick="cancelStatis()">×</div>
+                <div class="title">
+                    <span>Thống kê</span>
+                </div>
+                <div class="name-product">
+                    <div class="name-product-left">
+                        <p>Tên</p>
+                        {#                        <select#}
+                        {#                                name="name-product"#}
+                        {#                                id="name-product"#}
+                        {#                                onchange="updateStatis()"#}
+                        {#                        >#}
+                    </div>
+                    <div class="name-product-right">
+                        <div class="total-statis">
+                            Doanh thu 7 ngày:
+                            <span class="total-statis-price"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.querySelector('#admin').classList.add('nav__item__link--active')
+        document.querySelector('#home_nav').classList.remove('nav__item__link--active')
+    </script>
+    <script src="{% static 'js/admin/Script.js' %}"></script>
+    <script type="module" src="{% static 'js/admin/ManagerProduct.js' %}"></script>
+    <script src="{% static 'js/admin/ManagerUser.js' %}"></script>
+{% endblock %}
+
