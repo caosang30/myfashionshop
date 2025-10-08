@@ -3,6 +3,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    hide = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -19,8 +20,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
     name = models.CharField(max_length=255)
     price = models.FloatField()
-    image_link = models.CharField(max_length=255)
-    out_of_stock = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    hide = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -1,16 +1,18 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from orders.models import Invoice, InvoiceItem
+from orders.models import Invoice
 
 # Register your models here.
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'address', 'receiver', 'phone', 'formatted_created_at', 'formatted_total')
+    list_display = ('id', 'user', 'address', 'receiver', 'phone', 'formatted_created_at', 'formatted_total')
+    list_filter = ('created_at', 'user')
+    search_fields = ('id', 'phone', 'address', 'receiver')
+    ordering = ('-created_at',)
 
     readonly_fields = ('formatted_created_at', 'invoice_items_display', 'formatted_total_display')
-    fields = ('address', 'receiver', 'phone', 'formatted_created_at' , 'invoice_items_display', 'formatted_total_display', 'is_deleted')
-    ordering = ('-created_at',)
+    fields = ('address', 'receiver', 'phone', 'formatted_created_at' , 'invoice_items_display', 'formatted_total_display', 'hide')
 
     # Permissions
     def has_add_permission(self, request):
@@ -72,7 +74,3 @@ class InvoiceAdmin(admin.ModelAdmin):
         formatted = f"{obj.total:,.0f}đ".replace(",", ".")
         return format_html(f"<b>{formatted}</b>")
     formatted_total_display.short_description = "Total"
-
-# @admin.register(InvoiceItem)
-# class InvoiceItemAdmin(admin.ModelAdmin):
-#     list_display = ()

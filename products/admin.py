@@ -24,15 +24,19 @@ class ProductSizeInline(admin.StackedInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'category', 'name', 'formatted_price')
-    fields = ('category', 'name', 'price', 'out_of_stock')
+    search_fields = ('id', 'name', 'category__name')
+
+    fields = ('category', 'name', 'price', 'image', 'hide')
     inlines = [ProductSizeInline]
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
+    search_fields = ('id', 'name',)
     ordering = ('id',)
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
+    search_fields = ('id', 'name',)
     ordering = ('id',)
