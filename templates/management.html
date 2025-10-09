@@ -8,6 +8,7 @@
 
 {% block content %}
     <main class="main">
+        <!-- Tabs -->
         <div class="heading__manager content">
             <ul class="container__manager row">
                 <li class="item__manager managerUser item__manager__active ">User</li>
@@ -16,22 +17,81 @@
             </ul>
         </div>
 
-        <!-- user -->
+        <!-- User -->
         <div class="table__user table__wrap active">
+            <!-- Input form -->
+            <div class="content form__product">
+                <form method="POST" action="{% url 'create_user' %}" class="form_product__wrap">
+                    {% csrf_token %}
+                    <div class="title__product">
+                        <h1 class="title__product__wrap">User Management</h1>
+                    </div>
+                    <div class="form__group content">
+                        <label>Username</label>
+                        <input type="text" name="username" class="form__control" required>
+                    </div>
+                    <div class="form__group content">
+                        <label>Password</label>
+                        <input type="password" name="password" class="form__control" required>
+                    </div>
+                    <div class="form__group content">
+                        <label>Confirm password</label>
+                        <input type="password" name="confirm_password" class="form__control" required>
+                    </div>
+                    <div class="content btn__control__product">
+                        <button type="submit" class="btn__add btn">Add Customer</button>
+                    </div>
+                </form>
+
+                <form method="GET" action="{% url 'management' %}" class="form_product__wrap">
+                    <div class="form__group content">
+                        <label>Search</label>
+                        <input type="text" name="search_key" class="form__control" value="{{ request.GET.search_key }}">
+                    </div>
+                    <div class="content btn__control__product">
+                        <button type="submit" class="btn__add btn">Search</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- List -->
             <table class="table content">
                 <tr class="table__header_row">
                     <th class="table__header_col">Name User</th>
-                    <th class="table__header_col">Phone</th>
-                    <th class="table__header_col">position</th>
-                    <th class="table__header_col">edit</th>
+                    <th class="table__header_col">Position</th>
+                    <th class="table__header_col">Edit</th>
                 </tr>
                 <tbody class="listUsers">
-
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{% if user.is_staff %}
+                            ADMIN
+                        {% else %}
+                            Customer
+                        {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'delete_user' user.id %}"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">
+                                <img src="{% static 'img/img__delete.png' %}" alt="Xoá" class="img__delete__user">
+                            </a>
+                            <a href="{% url 'edit_user' user.id %}">
+                                <img src="{% static 'img/edit__img.jpeg' %}" alt="Xoá" class="img__delete__user">
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">Không có user nào.</td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- product -->
+        <!-- Product -->
         <div class="table__Product table__wrap unactive">
             <div class="content form__product">
                 <form action="" class="form_product__wrap">
@@ -152,12 +212,21 @@
 
     </main>
 
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                alert("{{ message|escapejs }}");
+            {% endfor %}
+        </script>
+    {% endif %}
+
     <script>
         document.querySelector('#admin').classList.add('nav__item__link--active')
         document.querySelector('#home_nav').classList.remove('nav__item__link--active')
     </script>
-    <script src="{% static 'js/admin/Script.js' %}"></script>
-    <script type="module" src="{% static 'js/admin/ManagerProduct.js' %}"></script>
-    <script src="{% static 'js/admin/ManagerUser.js' %}"></script>
+
+    <script src="{% static 'js/admin/main.js' %}"></script>
+    <script type="module" src="{% static 'js/admin/product.js' %}"></script>
+    <script src="{% static 'js/admin/user.js' %}"></script>
 {% endblock %}
 
