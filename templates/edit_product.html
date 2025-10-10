@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cập nhật sản phẩm{% endblock %}
+
+{% block content %}
+    <div class="form_product__wrap" style="max-width: 700px; margin: 0 auto;">
+        <h1 style="margin: 16px 0; text-align: center">Edit Product</h1>
+
+        <form method="POST" action="{% url 'edit_product' product.id %}" enctype="multipart/form-data" id="productForm">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <!-- Product sizes -->
+            <div class="product-sizes" style="margin-top: 24px;">
+                <h3 style="background-color: #447e9b; color: white; padding: 8px;">PRODUCT SIZES</h3>
+
+                <div id="sizesContainer">
+                    {% if product_size_ids %}
+                        {% for size_id in product_size_ids %}
+                            <div class="product-size-item"
+                                 style="border: 1px solid #ddd; padding: 10px; margin-top: 8px;">
+                                <label>Product size #{{ forloop.counter }}:</label>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                                    <select name="sizes[]" class="form__control" style="flex: 1;">
+                                        <option value="">---------</option>
+                                        {% for size in sizes %}
+                                            <option value="{{ size.id }}"
+                                                    {% if size.id == size_id %}selected{% endif %}>
+                                                {{ size.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="button" class="btn__add btn addSizeRow">+</button>
+                                    <button type="button" class="btn__delete btn removeSizeRow">×</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Nếu chưa có size nào, hiển thị form trống đầu tiên -->
+                        <div class="product-size-item"
+                             style="border: 1px solid #ddd; padding: 10px; margin-top: 8px;">
+                            <label>Product size #1:</label>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                                <select name="sizes[]" class="form__control" style="flex: 1;">
+                                    <option value="">---------</option>
+                                    {% for size in sizes %}
+                                        <option value="{{ size.id }}">{{ size.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn__add btn addSizeRow">+</button>
+                                <button type="button" class="btn__delete btn removeSizeRow">×</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <a href="#" id="addSizeLink" style="color: green; text-decoration: none;">
+                        + Add another Product size
+                    </a>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="content btn__control__product" style="margin-top: 24px;">
+                <button type="submit" class="btn__add btn">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                alert("{{ message|escapejs }}");
+            {% endfor %}
+        </script>
+    {% endif %}
+
+    <!-- Template for JS cloning -->
+    <template id="sizeTemplate">
+        <div class="product-size-item"
+             style="border: 1px solid #ddd; padding: 10px; margin-top: 8px;">
+            <label></label>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                <select name="sizes[]" class="form__control" style="flex: 1;">
+                    <option value="">---------</option>
+                    {% for size in sizes %}
+                        <option value="{{ size.id }}">{{ size.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn__add btn addSizeRow">+</button>
+                <button type="button" class="btn__delete btn removeSizeRow">×</button>
+            </div>
+        </div>
+    </template>
+
+    <script src="{% static 'js/admin/product.js' %}"></script>
+{% endblock %}

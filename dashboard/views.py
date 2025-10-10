@@ -4,16 +4,14 @@ from django.contrib import messages
 from django.core import serializers
 from django.shortcuts import redirect, get_object_or_404
 
-from products.models import Product
+from dashboard.admin import ProductForm
+from dashboard.check_admin import admin_required
+from products.models import Product, Category, Size, ProductSize
 
 
 # Create your views here.
+@admin_required
 def management(request):
-    # If request user is customer
-    if not request.user.is_superuser and not request.user.is_staff:
-        messages.error(request, "Bạn không có quyền truy cập trang này")
-        return redirect('/')
-
     search_user = request.GET.get('search_user', '').strip()
 
     if search_user:
@@ -40,6 +38,7 @@ def management(request):
     }
     return render(request, 'management.html', context)
 
+@admin_required
 def create_user(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -69,6 +68,7 @@ def create_user(request):
 
     return render(request, "management.html")
 
+@admin_required
 def edit_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
 
@@ -97,6 +97,7 @@ def edit_user(request, user_id):
 
     return render(request, 'edit_user.html', {'user': user})
 
+@admin_required
 def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
@@ -109,5 +110,67 @@ def delete_user(request, user_id):
     messages.success(request, f"Đã xóa người dùng '{user.username}' thành công.")
     return redirect('management')
 
+@admin_required
 def add_product(request):
-    return render(request, 'add_product.html')
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+        sizes = request.POST.getlist('sizes[]')  # Lấy danh sách size từ form JS
+
+        if form.is_valid():
+            product = form.save()
+
+            # Thêm các size tương ứng
+            for size_id in sizes:
+                if size_id:
+                    ProductSize.objects.create(product_id=product.id, size_id=size_id)
+
+            messages.success(request, "Thêm sản phẩm thành công!")
+            return redirect('management')
+        else:
+            messages.error(request, "Có lỗi xảy ra. Vui lòng kiểm tra lại form!")
+    else:
+        form = ProductForm()
+
+    context = {
+        'form': form,
+        'sizes': Size.objects.all(),
+    }
+    return render(request, 'add_product.html', context)
+
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    sizes = Size.objects.all()
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            # Lưu các field chính của product
+            updated_product = form.save()
+
+            # Lấy danh sách size được chọn từ form (name="sizes[]")
+            selected_size_ids = [int(s) for s in request.POST.getlist('sizes[]') if s]
+
+            # Thay thế toàn bộ quan hệ ProductSize bằng danh sách mới
+            # (xóa các liên kết cũ rồi tạo mới)
+            ProductSize.objects.filter(product=product).delete()
+            if selected_size_ids:
+                objs = [ProductSize(product=product, size_id=size_id) for size_id in selected_size_ids]
+                ProductSize.objects.bulk_create(objs)
+
+            messages.success(request, 'Cập nhật sản phẩm thành công!')
+            return redirect('management')
+        else:
+            messages.error(request, 'Có lỗi khi cập nhật. Vui lòng kiểm tra lại form.')
+    else:
+        form = ProductForm(instance=product)
+
+    # Lấy id của các size hiện có để hiển thị selected trong template
+    product_size_ids = list(ProductSize.objects.filter(product=product).values_list('size_id', flat=True))
+
+    context = {
+        'form': form,
+        'sizes': sizes,
+        'product': product,
+        'product_size_ids': product_size_ids,
+    }
+    return render(request, 'edit_product.html', context)

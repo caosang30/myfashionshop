@@ -102,7 +102,8 @@
             <div class="form__search content">
                 <form method="GET" action="/management/" style="display: flex;width: 100%;">
                     <input type="text" name="search_product" id="search__product" class="search__product"
-                           placeholder="Search" style="padding-left: 15px; flex: 1;" value="{{ request.GET.search_product }}">
+                           placeholder="Search" style="padding-left: 15px; flex: 1;"
+                           value="{{ request.GET.search_product }}">
                     <button class="btn__search btn" type="submit">Search Product</button>
                 </form>
             </div>
@@ -130,11 +131,7 @@
                         <td>{{ product.name }}</td>
                         <td>{{ product.price|floatformat:0|intcomma }} đ</td>
                         <td>
-                            <a href=""
-                               onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                                <img src="{% static 'img/img__delete.png' %}" alt="Xoá" class="img__delete__user">
-                            </a>
-                            <a href="">
+                            <a href="{% url 'edit_product' product.id %}">
                                 <img src="{% static 'img/edit__img.jpeg' %}" alt="Cập nhật" class="img__delete__user">
                             </a>
                         </td>
@@ -237,6 +234,5 @@
     </script>
 
     <script src="{% static 'js/admin/main.js' %}"></script>
-    <script type="module" src="{% static 'js/admin/product.js' %}"></script>
 {% endblock %}
 

@@ -30,7 +30,7 @@ class Product(models.Model):
         return f"{self.price:,.0f}đ".replace(",", ".")
 
 class ProductSize(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     size = models.ForeignKey(Size, on_delete=models.PROTECT)
 
     class Meta:
