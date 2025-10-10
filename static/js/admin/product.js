@@ -1,215 +1,61 @@
-import { listProductData } from "../data/listProduct.js";
-const listProducts =JSON.parse(localStorage.getItem("listProducts")) || listProductData;
-localStorage.setItem("listProducts", JSON.stringify(listProducts));
+document.addEventListener("DOMContentLoaded", function () {
+    const sizesContainer = document.getElementById("sizesContainer");
+    const addSizeLink = document.getElementById("addSizeLink");
 
-const $ = document.querySelector.bind(document);
+    // Thêm size mới
+    addSizeLink.addEventListener("click", function (e) {
+        e.preventDefault();
 
-function upDateProduct(listProducts) {
-  const listProduct = $(".listProduct");
-  listProduct.innerHTML = " ";
-  const productElemnets = listProducts.map((product, i) => {
-    const trProduct = document.createElement("tr");
-    trProduct.appendChild(newTd("IDProduct", i + 1));
-    trProduct.appendChild(newProduct(product.url));
-    trProduct.appendChild(newTd("nameProduct", product.name));
-    trProduct.appendChild(newTd("priceProduct", `${product.price}$`));
-    trProduct.appendChild(newEditTd());
-    return trProduct;
-  });
-  productElemnets.forEach((productElemnet) => {
-    listProduct.appendChild(productElemnet);
-  });
-}
-upDateProduct(listProducts);
+        const count = sizesContainer.children.length + 1;
+        const newItem = document.createElement("div");
+        newItem.classList.add("product-size-item");
+        newItem.dataset.index = count;
+        newItem.style = "border: 1px solid #ddd; padding: 10px; margin-top: 8px;";
 
-// create td
-function newTd(className, value) {
-  var td = document.createElement("td");
-  td.className = className;
-  td.innerHTML = value;
-  return td;
-}
-//   newEditTd
-function newEditTd() {
-  const td = document.createElement("td");
-  const deleteIcon = document.createElement("img");
-  deleteIcon.src = "../assets/img/img__delete.png";
-  deleteIcon.alt = "Xoá";
-  deleteIcon.classList.add("img__delete__product");
+        newItem.innerHTML = `
+                <label>Product size #${count}:</label>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                    <select name="sizes[]" class="form__control" style="flex: 1;">
+                        <option value="">---------</option>
+                        {% for size in sizes %}
+                        <option value="{{ size.id }}">{{ size.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn__delete btn removeSizeRow">×</button>
+                </div>
+            `;
 
-  const editIcon = document.createElement("img");
-  editIcon.src = "../assets/img/edit__img.jpeg";
-  editIcon.classList.add("img__edit");
-
-  td.appendChild(deleteIcon);
-  td.appendChild(editIcon);
-  return td;
-}
-//   img product
-function newProduct(linkimg) {
-  const td = document.createElement("td");
-  const imgProduct = document.createElement("img");
-  imgProduct.src = linkimg;
-  imgProduct.classList.add("img__product");
-
-  td.appendChild(imgProduct);
-  return td;
-}
-
-// toggle Element
-function toggleElenment(element, className) {
-  const testClass = element.classList.contains("unactive");
-  if (testClass) {
-    element.classList.remove("unactive");
-    element.classList.add(className);
-  } else {
-    element.classList.add("unactive");
-    element.classList.remove(className);
-  }
-}
-// block delete
-const blockDeleteProduct = $(".block__deletePoduct");
-const listProduct = $(".listProduct");
-
-listProduct.addEventListener("click", (event) => {
-  const target = event.target;
-  if (target.classList.contains("img__delete__product")) {
-    toggleElenment(blockDeleteProduct, "active");
-    const deleteButton = $(".btn__deletePoduct");
-
-    deleteButton.addEventListener("click", () => {
-      const productRow = target.closest("tr");
-      const index = Array.from(productRow.parentNode.children).indexOf(productRow);
-      deleteProduct(listProducts, index);
-      toggleElenment(blockDeleteProduct, "active");
+        sizesContainer.appendChild(newItem);
+        updateRemoveButtons();
     });
-  }
-});
 
+    // Xóa size
+    sizesContainer.addEventListener("click", function (e) {
+        if (e.target.classList.contains("removeSizeRow")) {
+            e.target.closest(".product-size-item").remove();
+            updateIndexes();
+            updateRemoveButtons();
+        }
+    });
 
-
-function deleteProduct(listProducts, i) {
-  listProducts.splice(i, 1);
-  localStorage.setItem("listProducts", JSON.stringify(listProducts));
-  upDateProduct(listProducts);
-  refreshEdits();
-}
-
-// out block delete
-const btnCancleDelete = $(".btn__cancle__deletePoduct");
-btnCancleDelete.addEventListener("click", () => {
-  toggleElenment(blockDeleteProduct, "active");
-});
-// add product
-function addProduct() {
-  const src = document.getElementById("src__product").value;
-  const nameProduct = document.getElementById("name__product").value;
-  const price = document.getElementById("price__product").value;
-
-  if (!src || !nameProduct || !price) {
-    alert("Vui lòng nhập đủ thông tin.");
-  } else {
-    const product = {
-      id: listProducts.length,
-      url: src,
-      name: nameProduct,
-      price,
-    };
-    listProducts.push(product);
-    localStorage.setItem("listProducts", JSON.stringify(listProducts));
-    upDateProduct(listProducts);
-    formProduct.reset();
-    refreshEdits();
-  }
-}
-
-const btnAddProduct = $(".btn__add");
-btnAddProduct.addEventListener("click", () => {
-  addProduct();
-});
-
-// search Product
-function searchProduct() {
-  const keyWord = chuyenChuoiInHoaKhongDau(
-    document.getElementById("search__product").value
-  );
-  const listProducts = JSON.parse(localStorage.getItem("listProducts"));
-  const listProductResult = [];
-
-  if (!keyWord) {
-    upDateProduct(listProducts);
-    return;
-  } else {
-    let result = false;
-
-    for (let i = 0; i < listProducts.length; i++) {
-      const product = chuyenChuoiInHoaKhongDau(listProducts[i].name);
-      if (product.indexOf(keyWord) !== -1) {
-        listProductResult.push(listProducts[i]);
-        result = true;
-      }
+    // Cập nhật số thứ tự
+    function updateIndexes() {
+        Array.from(sizesContainer.children).forEach((item, i) => {
+            item.dataset.index = i + 1;
+            item.querySelector("label").textContent = `Product size #${i + 1}:`;
+        });
     }
 
-    if (result) {
-      upDateProduct(listProductResult);
-      document.getElementById("search__product").value = "";
-    } else {
-      alert("Không tìm thấy sản phẩm");
-      document.getElementById("search__product").value = "";
+    // Ẩn/hiện nút xóa
+    function updateRemoveButtons() {
+        const items = sizesContainer.querySelectorAll(".product-size-item");
+        items.forEach((item, i) => {
+            const removeBtn = item.querySelector(".removeSizeRow");
+            if (removeBtn) {
+                removeBtn.style.display = (items.length > 1) ? "inline-block" : "none";
+            }
+        });
     }
-  }
-}
-$(".btn__search").addEventListener("click", () => {
-  searchProduct();
-  refreshEdits();
+
+    updateRemoveButtons();
 });
-
-function chuyenChuoiInHoaKhongDau(chuoi) {
-  return chuoi
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-// edit product
-
-const editIcons = document.querySelectorAll(".img__edit");
-editIcons.forEach((editIcon, index) => {
-  editIcon.addEventListener("click", () => {
-    editProduct(index);
-    window.scrollTo(0, 0);
-  });
-});
-
-const formProduct = $(".form_product__wrap");
-
-function editProduct(index) {
-  const editingProductIndex = index;
-  const product = listProducts[index];
-
-  document.getElementById("src__product").value = product.url;
-  document.getElementById("name__product").value = product.name;
-  document.getElementById("price__product").value = product.price;
-
-  const btnUpdate = $(".btn__edit");
-  btnUpdate.addEventListener("click", () => {
-    if (editingProductIndex !== -1) {
-      const src = document.getElementById("src__product").value;
-      const nameProduct = document.getElementById("name__product").value;
-      const price = document.getElementById("price__product").value;
-
-      if (!src || !nameProduct || isNaN(price)) {
-        alert("Vui lòng nhập đủ thông tin và giá sản phẩm hợp lệ.");
-      } else {
-        listProducts[editingProductIndex] = {
-          url: src,
-          name: nameProduct,
-          price: price,
-        };
-        upDateProduct(listProducts);
-        localStorage.setItem("listProducts", JSON.stringify(listProducts));
-        formProduct.reset();
-        editingProductIndex = -1;
-      }
-    }
-  });
-}

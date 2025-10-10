@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Trang Quản Lý{% endblock %}
 {% block css %}
@@ -46,7 +47,8 @@
                 <form method="GET" action="{% url 'management' %}" class="form_product__wrap">
                     <div class="form__group content">
                         <label>Search</label>
-                        <input type="text" name="search_key" class="form__control" value="{{ request.GET.search_key }}">
+                        <input type="text" name="search_user" class="form__control"
+                               value="{{ request.GET.search_user }}">
                     </div>
                     <div class="content btn__control__product">
                         <button type="submit" class="btn__add btn">Search</button>
@@ -78,7 +80,7 @@
                                 <img src="{% static 'img/img__delete.png' %}" alt="Xoá" class="img__delete__user">
                             </a>
                             <a href="{% url 'edit_user' user.id %}">
-                                <img src="{% static 'img/edit__img.jpeg' %}" alt="Xoá" class="img__delete__user">
+                                <img src="{% static 'img/edit__img.jpeg' %}" alt="Cập nhật" class="img__delete__user">
                             </a>
                         </td>
                     </tr>
@@ -93,46 +95,55 @@
 
         <!-- Product -->
         <div class="table__Product table__wrap unactive">
-            <div class="content form__product">
-                <form action="" class="form_product__wrap">
-                    <div class="title__product">
-                        <h1 class="title__product__wrap">Management Product</h1>
-                    </div>
-                    <div class="form__group content">
-                        <label for="src">Product</label>
-                        <input type="text" name="src" id="src__product" class="form__control" placeholder="SRC:">
-                    </div>
-                    <div class="form__group content">
-                        <label for="name__product">Name Product</label>
-                        <input type="text" name="name__product" id="name__product" class="form__control"
-                               placeholder="Name Product:">
-                    </div>
-                    <div class="form__group content">
-                        <label for="price__product">Price Product</label>
-                        <input type="text" name="price__product" id="price__product" class="form__control"
-                               placeholder="Price">
-                    </div>
-                </form>
-                <div class="content btn__control__product">
-                    <button class="btn__add btn">Add Product</button>
-                    <button class="btn__edit btn">repair Product</button>
-                </div>
+            <div class="content btn__control__product">
+                <a href="{% url 'add_product' %}" class="btn__add btn">Add Product</a>
             </div>
+
             <div class="form__search content">
-                <input type="text" name="search__product" id="search__product" class="search__product"
-                       placeholder="Search" style="padding-left: 15px;">
-                <button class="btn__search btn">Search Product</button>
+                <form method="GET" action="/management/" style="display: flex;width: 100%;">
+                    <input type="text" name="search_product" id="search__product" class="search__product"
+                           placeholder="Search" style="padding-left: 15px; flex: 1;" value="{{ request.GET.search_product }}">
+                    <button class="btn__search btn" type="submit">Search Product</button>
+                </form>
             </div>
+
             <table class="table content">
                 <tr class="table__header_row">
                     <th class="table__header_col">ID</th>
-                    <th class="table__header_col">Product</th>
+                    <th class="table__header_col">Image</th>
                     <th class="table__header_col">Name</th>
                     <th class="table__header_col">Price</th>
-                    <th class="table__header_col">edit</th>
+                    <th class="table__header_col">Edit</th>
                 </tr>
                 <tbody class="listProduct">
-
+                {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                                <span style="color: #999;">No image</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price|floatformat:0|intcomma }} đ</td>
+                        <td>
+                            <a href=""
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                <img src="{% static 'img/img__delete.png' %}" alt="Xoá" class="img__delete__user">
+                            </a>
+                            <a href="">
+                                <img src="{% static 'img/edit__img.jpeg' %}" alt="Cập nhật" class="img__delete__user">
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center;">Không có sản phẩm nào</td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -227,6 +238,5 @@
 
     <script src="{% static 'js/admin/main.js' %}"></script>
     <script type="module" src="{% static 'js/admin/product.js' %}"></script>
-    <script src="{% static 'js/admin/user.js' %}"></script>
 {% endblock %}
 

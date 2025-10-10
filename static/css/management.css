@@ -94,7 +94,7 @@ tr,td {
     border-radius: 0.6rem;
 }
 .form__search {
-    margin-top: 10rem;
+    margin-top: 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;

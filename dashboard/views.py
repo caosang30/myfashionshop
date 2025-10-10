@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.core import serializers
 from django.shortcuts import redirect, get_object_or_404
 
+from products.models import Product
+
+
 # Create your views here.
 def management(request):
     # If request user is customer
@@ -11,16 +14,29 @@ def management(request):
         messages.error(request, "Bạn không có quyền truy cập trang này")
         return redirect('/')
 
-    search_key = request.GET.get('search_key', '').strip()
+    search_user = request.GET.get('search_user', '').strip()
 
-    if search_key:
-        users = User.objects.filter(username__icontains=search_key)
+    if search_user:
+        users = User.objects.filter(username__icontains=search_user)
     else:
         users = User.objects.all()
 
+    # --- Search cho Product ---
+    search_product = request.GET.get('search_product', '').strip()
+
+    if search_product:
+        products = Product.objects.filter(name__icontains=search_product, hide=False)
+    else:
+        products = Product.objects.filter(hide=False)
+
     context = {
+        # User data
         'users': users,
-        'search_key': search_key
+        'search_user': search_user,
+
+        # Product data
+        'products': products,
+        'search_product': search_product,
     }
     return render(request, 'management.html', context)
 
@@ -92,3 +108,6 @@ def delete_user(request, user_id):
     user.delete()
     messages.success(request, f"Đã xóa người dùng '{user.username}' thành công.")
     return redirect('management')
+
+def add_product(request):
+    return render(request, 'add_product.html')
