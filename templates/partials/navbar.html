@@ -6,17 +6,18 @@
             <img src="{% static 'img/logo.svg' %}" alt="Logo" class="logo_main">
         </a>
         <div class="icon__dash">☰</div>
+
         <div class="header__main">
             <nav class="nav">
                 <ul class="nav__container row">
                     <li class="nav__item">
-                        <a href="{% url 'home' %}" class="nav__item__link nav__item__link--active">Home</a>
+                        <a href="{% url 'home' %}" class="nav__item__link nav__item__link--active" id="home_nav">Home</a>
                     </li>
                     <li class="nav__item">
                         <a href="" class="nav__item__link">Contacts</a>
                     </li>
                     <li class="nav__item">
-                        <a href="" class="nav__item__link" id="admin">Management</a>
+                        <a href="{% url 'management' %}" class="nav__item__link" id="admin">Management</a>
                     </li>
                 </ul>
             </nav>

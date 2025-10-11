@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Trang Quản Lý{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/management.css' %}">
+{% endblock %}
+
+{% block content %}
+    <main class="main">
+        <!-- Tabs -->
+        <div class="heading__manager content">
+            <ul class="container__manager row">
+                <li class="item__manager managerUser item__manager__active ">User</li>
+                <li class="item__manager managerProduct">Product</li>
+                <li class="item__manager managerOrder">Order</li>
+            </ul>
+        </div>
+
+        <!-- User -->
+        <div class="table__user table__wrap active">
+            <!-- Input form -->
+            <div class="content form__product">
+                <form method="POST" action="{% url 'create_user' %}" class="form_product__wrap">
+                    {% csrf_token %}
+                    <div class="title__product">
+                        <h1 class="title__product__wrap">User Management</h1>
+                    </div>
+                    <div class="form__group content">
+                        <label>Username</label>
+                        <input type="text" name="username" class="form__control" required>
+                    </div>
+                    <div class="form__group content">
+                        <label>Password</label>
+                        <input type="password" name="password" class="form__control" required>
+                    </div>
+                    <div class="form__group content">
+                        <label>Confirm password</label>
+                        <input type="password" name="confirm_password" class="form__control" required>
+                    </div>
+                    <div class="content btn__control__product">
+                        <button type="submit" class="btn__add btn">Add Customer</button>
+                    </div>
+                </form>
+
+                <form method="GET" action="{% url 'management' %}" class="form_product__wrap">
+                    <div class="form__group content">
+                        <label>Search</label>
+                        <input type="text" name="search_user" class="form__control"
+                               value="{{ request.GET.search_user }}">
+                    </div>
+                    <div class="content btn__control__product">
+                        <button type="submit" class="btn__add btn">Search</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- List -->
+            <table class="table content">
+                <tr class="table__header_row">
+                    <th class="table__header_col">Name User</th>
+                    <th class="table__header_col">Position</th>
+                    <th class="table__header_col">Edit</th>
+                </tr>
+                <tbody class="listUsers">
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{% if user.is_staff %}
+                            ADMIN
+                        {% else %}
+                            Customer
+                        {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'delete_user' user.id %}"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">
+                                <img src="{% static 'img/img__delete.png' %}" alt="Xoá" class="img__delete__user">
+                            </a>
+                            <a href="{% url 'edit_user' user.id %}">
+                                <img src="{% static 'img/edit__img.jpeg' %}" alt="Cập nhật" class="img__delete__user">
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">Không có user nào.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Product -->
+        <div class="table__Product table__wrap unactive">
+            <div class="content btn__control__product">
+                <a href="{% url 'add_product' %}" class="btn__add btn">Add Product</a>
+            </div>
+
+            <div class="form__search content">
+                <form method="GET" action="/management/" style="display: flex;width: 100%;">
+                    <input type="text" name="search_product" id="search__product" class="search__product"
+                           placeholder="Search" style="padding-left: 15px; flex: 1;"
+                           value="{{ request.GET.search_product }}">
+                    <button class="btn__search btn" type="submit">Search Product</button>
+                </form>
+            </div>
+
+            <table class="table content">
+                <tr class="table__header_row">
+                    <th class="table__header_col">ID</th>
+                    <th class="table__header_col">Image</th>
+                    <th class="table__header_col">Name</th>
+                    <th class="table__header_col">Price</th>
+                    <th class="table__header_col">Edit</th>
+                </tr>
+                <tbody class="listProduct">
+                {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                                <span style="color: #999;">No image</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price|floatformat:0|intcomma }} đ</td>
+                        <td>
+                            <a href="{% url 'edit_product' product.id %}">
+                                <img src="{% static 'img/edit__img.jpeg' %}" alt="Cập nhật" class="img__delete__user">
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center;">Không có sản phẩm nào</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- oder -->
+        <div class="table__order table__wrap unactive" onload="showOrdersList()">
+            <div class="search-order">
+                <div class="search-order-tittle">BẢNG TRA CỨU</div>
+                <div class="search-order-input">
+                    <input
+                            type="text"
+                            name="id-order"
+                            id="id-order"
+                            placeholder="Nhập mã đơn hàng"
+                    />
+                    <input type="date" name="date-order" id="date-order"/>
+                    <select name="date-around" id="date-around">
+                        <option value="7">Tuần này</option>
+                        <option value="30">Tháng này</option>
+                        <option value="365">Năm này</option>
+                    </select>
+                </div>
+                <button onclick="searchOrder()">Tra cứu</button>
+                <button onclick="statis(); updateStatis()">Bảng thống kê</button>
+            </div>
+            <div class="table__order--warning">(*)Nhấn Interupt sẽ xóa toàn bộ order</div>
+            <table class="table content table--order">
+                <tr class="table__header_row">
+                    <th class="table__header_col id-order">ID Order</th>
+                    <th class="table__header_col name-user">Name User</th>
+                    <th class="table__header_col info">Info</th>
+                    <th class="table__header_col price">Price</th>
+                    <th class="table__header_col date">Date</th>
+                    <th class="table__header_col accept">Accept</th>
+                    <th class="table__header_col interupt" onclick="interupt()">Interupt</th>
+                </tr>
+                <tbody class="listOrders">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="block__deletePoduct unactive">
+            <div class="block__deletePoduct__wrap">
+                <h1 class="block__deletePoduct__title">
+                    Do you want to Delete Product?
+                </h1>
+                <div class="btn__block__deletePoduct row content">
+                    <button class="btn__cancle__deletePoduct">Cancle</button>
+                    <button class="btn__deletePoduct">Delete</button>
+                </div>
+            </div>
+        </div>
+        <div class="statistics modal" style="display: none">
+            <div class="statis">
+                <div class="cancel-statis" onclick="cancelStatis()">×</div>
+                <div class="title">
+                    <span>Thống kê</span>
+                </div>
+                <div class="name-product">
+                    <div class="name-product-left">
+                        <p>Tên</p>
+                        {#                        <select#}
+                        {#                                name="name-product"#}
+                        {#                                id="name-product"#}
+                        {#                                onchange="updateStatis()"#}
+                        {#                        >#}
+                    </div>
+                    <div class="name-product-right">
+                        <div class="total-statis">
+                            Doanh thu 7 ngày:
+                            <span class="total-statis-price"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                alert("{{ message|escapejs }}");
+            {% endfor %}
+        </script>
+    {% endif %}
+
+    <script>
+        document.querySelector('#admin').classList.add('nav__item__link--active')
+        document.querySelector('#home_nav').classList.remove('nav__item__link--active')
+    </script>
+
+    <script src="{% static 'js/admin/main.js' %}"></script>
+{% endblock %}
+

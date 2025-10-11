@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sửa thông tin user{% endblock %}
+
+
+{% block content %}
+    <div class="form_product__wrap">
+        <h1 style="margin: 16px 0; text-align: center">Chỉnh sửa mật khẩu người dùng: <b style="font-weight: bold">{{ user.username }}</b></h1>
+
+        <form method="POST" action="{% url 'edit_user' user.id %}">
+            {% csrf_token %}
+            <div class="form__group">
+                <label>Mật khẩu Cũ</label>
+                <input type="password" name="old_password" class="form__control" required>
+            </div>
+            <div class="form__group">
+                <label>Mật khẩu mới</label>
+                <input type="password" name="new_password" class="form__control" required>
+            </div>
+            <div class="form__group">
+                <label>Xác nhận mật khẩu</label>
+                <input type="password" name="confirm_password" class="form__control" required>
+            </div>
+            <div class="form__group">
+                <button type="submit" class="btn btn__add">Cập nhật</button>
+                <a href="{% url 'management' %}" class="btn" style="text-decoration: none">Hủy</a>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                alert("{{ message|escapejs }}");
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endblock %}
