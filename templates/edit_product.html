@@ -16,43 +16,25 @@
                 <h3 style="background-color: #447e9b; color: white; padding: 8px;">PRODUCT SIZES</h3>
 
                 <div id="sizesContainer">
-                    {% if product_size_ids %}
-                        {% for size_id in product_size_ids %}
-                            <div class="product-size-item"
-                                 style="border: 1px solid #ddd; padding: 10px; margin-top: 8px;">
-                                <label>Product size #{{ forloop.counter }}:</label>
-                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                                    <select name="sizes[]" class="form__control" style="flex: 1;">
-                                        <option value="">---------</option>
-                                        {% for size in sizes %}
-                                            <option value="{{ size.id }}"
-                                                    {% if size.id == size_id %}selected{% endif %}>
-                                                {{ size.name }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                    <button type="button" class="btn__add btn addSizeRow">+</button>
-                                    <button type="button" class="btn__delete btn removeSizeRow">×</button>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <!-- Nếu chưa có size nào, hiển thị form trống đầu tiên -->
+                    {% for size_id in product_size_ids %}
                         <div class="product-size-item"
                              style="border: 1px solid #ddd; padding: 10px; margin-top: 8px;">
-                            <label>Product size #1:</label>
+                            <label>Product size #{{ forloop.counter }}:</label>
                             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                                 <select name="sizes[]" class="form__control" style="flex: 1;">
                                     <option value="">---------</option>
                                     {% for size in sizes %}
-                                        <option value="{{ size.id }}">{{ size.name }}</option>
+                                        <option value="{{ size.id }}"
+                                                {% if size.id == size_id %}selected{% endif %}>
+                                            {{ size.name }}
+                                        </option>
                                     {% endfor %}
                                 </select>
                                 <button type="button" class="btn__add btn addSizeRow">+</button>
                                 <button type="button" class="btn__delete btn removeSizeRow">×</button>
                             </div>
                         </div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
 
                 <div style="margin-top: 10px;">

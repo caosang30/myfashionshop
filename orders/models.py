@@ -19,8 +19,5 @@ class Invoice(models.Model):
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
-    product_size = models.ForeignKey(ProductSize, on_delete=models.PROTECT)
+    product_size = models.ForeignKey(ProductSize, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField()
-
-    # def __str__(self):
-    #     return f"{self.invoice} - {self.product_size} x {self.quantity}"

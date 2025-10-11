@@ -23,9 +23,9 @@ def management(request):
     search_product = request.GET.get('search_product', '').strip()
 
     if search_product:
-        products = Product.objects.filter(name__icontains=search_product, hide=False)
+        products = Product.objects.filter(name__icontains=search_product)
     else:
-        products = Product.objects.filter(hide=False)
+        products = Product.objects.all()
 
     context = {
         # User data
