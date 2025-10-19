@@ -27,6 +27,7 @@ urlpatterns = [
 
     path('', views.home, name="home"),
     path('management/', include('dashboard.urls')),
+    path('products/', include('products.urls')), 
 ]
 
 if settings.DEBUG:

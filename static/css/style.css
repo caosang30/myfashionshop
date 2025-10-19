@@ -96,6 +96,13 @@
     margin-right: 2rem;
     line-height: 1.1;
 }
+.product__category {
+    font-size: 1.5rem;
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+    margin-right: 2rem;
+    line-height: 1.1;
+}
 .product__price {
     margin-left: 2rem;
     font-size: 2rem;

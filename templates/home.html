@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <class id="main">
+<!--    <class id="main">
         <div class="heading"></div>
         <div class="container content">
             <div class="container__wrap">
@@ -23,7 +23,66 @@
                 </ul>
             </div>
         </div>
-    </class>
+        <div class="form__search__wrap content">
+            <div class="form__search-suggest">
+                <div class="form__search">
+                    <input type="text" name="search__product" id="search__product" class="search__product" style="padding: 15px;"
+                        placeholder="Search">
+                    <button class="btn__search btn">Search</button>
+                </div>
+                <ul class="suggest-product-list">
+                    </ul>
+            </div>
+        </div>
+         <div class="list__product content">
+            <ul class="list__product__container">
+            </ul>
+        </div>
+    </class>-->
+    <main id="main">
+    <div class="heading"></div>
+    <div class="container content">
+        <div class="container__wrap">
+            <ul class="container__menu row">
+                <li class="item__menu {% if not active_category %}item__menu__active{% endif %}">
+                    <a href="{% url 'home' %}">All</a>
+                </li>
+                {% for cat in categories %}
+                <li class="item__menu {% if cat.id == active_category %}item__menu__active{% endif %}">
+                    <a href="{% url 'product_by_category' cat.id %}">{{ cat.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="form__search__wrap content">
+        <div class="form__search-suggest">
+            <form class="form__search" method="get" action="{% url 'home' %}">
+                <input type="text" name="search" id="search__product" class="search__product" placeholder="Search" style="padding: 15px;"  value="{{ search_query|default:'' }}">
+                <button class="btn__search btn" type="submit">Search</button>
+            </form>
+            <ul class="suggest-product-list"></ul>
+        </div>
+    </div>
+
+    <div class="list__product content">
+        <ul class="list__product__container">
+            {% for product in products %}
+                <li class="product__item">
+                    <div class="product__item__wrap">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
+                        <h3 class="product__name">{{ product.name }}</h3>
+                        <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
+                        <span class="product__price">Giá: {{ product.formatted_price }}</p>
+                    </div>
+                </li>
+            {% empty %}
+                <p>Không có sản phẩm nào.</p>
+            {% endfor %}
+        </ul>
+    </div>
+</main>
 
     {% if messages %}
         <script>
