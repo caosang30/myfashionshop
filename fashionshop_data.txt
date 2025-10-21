@@ -1,0 +1,41 @@
+Sử dụng termianal dự án add data vào database MySQL bằng python:
+python manage.py shell rồi enter
+Rồi paste code này hoặc tự tạo
+
+from products.models import Category, Product, Size, ProductSize
+
+# Create categories
+cat1 = Category.objects.create(name="Áo Sơ Mi")
+cat2 = Category.objects.create(name="Áo Polo")
+cat3 = Category.objects.create(name="Quần Jean")
+
+# Create sizes
+s_m = Size.objects.create(name="M")
+s_l = Size.objects.create(name="L")
+
+# Create products (note the image paths!)
+p1 = Product.objects.create(
+    category=cat1,
+    name="Áo Sơ Mi Trắng Basic",
+    price=299000,
+    image="product_images/16.webp"
+)
+
+p2 = Product.objects.create(
+    category=cat2,
+    name="Áo Polo Nam Xanh Navy",
+    price=349000,
+    image="product_images/product_1.webp"
+)
+
+p3 = Product.objects.create(
+    category=cat3,
+    name="Quần Jean Slimfit Xanh Đậm",
+    price=499000,
+    image="product_images/23.jpg"
+)
+
+# Link product sizes
+ProductSize.objects.create(product=p1, size=s_m)
+ProductSize.objects.create(product=p2, size=s_l)
+ProductSize.objects.create(product=p3, size=s_m)
