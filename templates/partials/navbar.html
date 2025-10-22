@@ -40,18 +40,22 @@
             </div>
 
 
-            <div class="user unactive">
-                <div class="user__wrap row">
-                    <span class="user__name"></span>
-                    <img src="{% static 'img/user-Img.png' %}" alt="User" class="user__img">
-
-                    <a href="">
-                        <div class="cart-quantity"><span class="cart-quantity-text"></span></div>
-                        <img src="{% static 'img/img__cart.png' %}" alt="Cart" class="cart__img">
-                    </a>            
-
-                    <img src="{% static 'img/signOut-icon.png' %}" alt="Sign out" class="sign__out">
-                </div>
+            <div class="cart-link" style="margin-left: 20px;">
+                <a href="{% url 'cart:cart_view' %}" style="position: relative; display: inline-block;">
+                    <img src="{% static 'img/img__cart.png' %}" alt="Cart" class="cart__img" style="width: 30px; height: 30px;">
+                    <span class="cart-count" style="
+                        position: absolute;
+                        top: -8px;
+                        right: -8px;
+                        background: #e74c3c;
+                        color: white;
+                        border-radius: 50%;
+                        padding: 2px 6px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        display: none;
+                    ">0</span>
+                </a>
             </div>
         </div>
     </div>

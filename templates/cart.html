@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Giỏ hàng - FashionShop{% endblock %}
+
+{% block css %}
+<style>
+    .cart-container {
+        max-width: 1200px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+    
+    .cart-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .cart-items {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        gap: 20px;
+    }
+    
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+    
+    .cart-item-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .cart-item-info {
+        flex: 1;
+    }
+    
+    .cart-item-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .cart-item-size {
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .cart-item-price {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
+    .cart-item-quantity {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ddd;
+        background: #f8f8f8;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .quantity-btn:hover {
+        background: #e0e0e0;
+    }
+    
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 1px solid #ddd;
+        padding: 5px;
+        border-radius: 4px;
+    }
+    
+    .remove-btn {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .remove-btn:hover {
+        background: #c0392b;
+    }
+    
+    .cart-summary {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+    
+    .summary-total {
+        font-weight: bold;
+        font-size: 24px;
+        color: #e74c3c;
+        border-top: 2px solid #eee;
+        padding-top: 15px;
+    }
+    
+    .checkout-form {
+        margin-top: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    
+    .checkout-btn {
+        width: 100%;
+        padding: 15px;
+        background: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    
+    .checkout-btn:hover {
+        background: #229954;
+    }
+    
+    .checkout-btn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 50px;
+        font-size: 20px;
+        color: #999;
+    }
+    
+    .continue-shopping {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    
+    .continue-shopping:hover {
+        background: #2980b9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1 class="cart-title">Giỏ hàng của bạn</h1>
+    
+    <div id="cart-content">
+        <div class="empty-cart">
+            <p>Giỏ hàng trống</p>
+            <a href="{% url 'home' %}" class="continue-shopping">Tiếp tục mua sắm</a>
+        </div>
+    </div>
+    
+    <div id="cart-items-container" style="display: none;">
+        <div class="cart-items" id="cart-items-list"></div>
+        
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Tổng cộng:</span>
+                <span id="cart-total">0đ</span>
+            </div>
+            
+            <div class="summary-row summary-total">
+                <span>Tổng thanh toán:</span>
+                <span id="cart-final-total">0đ</span>
+            </div>
+            
+            {% if user.is_authenticated %}
+            <form id="checkout-form" class="checkout-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="receiver">Người nhận:</label>
+                    <input type="text" id="receiver" name="receiver" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Địa chỉ:</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Số điện thoại:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <button type="submit" class="checkout-btn">Đặt hàng</button>
+            </form>
+            {% else %}
+            <div style="text-align: center; margin-top: 20px;">
+                <p>Vui lòng <a href="{% url 'login' %}?next={% url 'cart:cart_view' %}">đăng nhập</a> để đặt hàng</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cart management using LocalStorage
+    const CART_KEY = 'fashionshop_cart';
+    
+    // Get cart from LocalStorage
+    function getCart() {
+        const cart = localStorage.getItem(CART_KEY);
+        return cart ? JSON.parse(cart) : [];
+    }
+    
+    // Save cart to LocalStorage
+    function saveCart(cart) {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+    
+    // Format price
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+    
+    // Update cart display
+    function updateCartDisplay() {
+        const cart = getCart();
+        const cartContent = document.getElementById('cart-content');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        
+        if (cart.length === 0) {
+            cartContent.style.display = 'block';
+            cartItemsContainer.style.display = 'none';
+            return;
+        }
+        
+        cartContent.style.display = 'none';
+        cartItemsContainer.style.display = 'block';
+        
+        const cartItemsList = document.getElementById('cart-items-list');
+        cartItemsList.innerHTML = '';
+        
+        let total = 0;
+        
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'cart-item';
+            itemDiv.innerHTML = `
+                <img src="${item.image || '/static/img/logo.svg'}" alt="${item.name}" class="cart-item-image">
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-size">Size: ${item.size}</div>
+                    <div class="cart-item-price">${formatPrice(item.price)}</div>
+                </div>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                    <input type="number" class="quantity-input" value="${item.quantity}" 
+                           onchange="setQuantity(${index}, this.value)" min="1">
+                    <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">${formatPrice(itemTotal)}</div>
+                    <button class="remove-btn" onclick="removeItem(${index})">Xóa</button>
+                </div>
+            `;
+            cartItemsList.appendChild(itemDiv);
+        });
+        
+        document.getElementById('cart-total').textContent = formatPrice(total);
+        document.getElementById('cart-final-total').textContent = formatPrice(total);
+    }
+    
+    // Update quantity
+    function updateQuantity(index, change) {
+        const cart = getCart();
+        cart[index].quantity += change;
+        if (cart[index].quantity < 1) {
+            cart[index].quantity = 1;
+        }
+        saveCart(cart);
+        updateCartDisplay();
+    }
+    
+    // Set quantity directly
+    function setQuantity(index, value) {
+        const cart = getCart();
+        const quantity = parseInt(value);
+        if (quantity > 0) {
+            cart[index].quantity = quantity;
+            saveCart(cart);
+            updateCartDisplay();
+        }
+    }
+    
+    // Remove item from cart
+    function removeItem(index) {
+        if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+            const cart = getCart();
+            cart.splice(index, 1);
+            saveCart(cart);
+            updateCartDisplay();
+        }
+    }
+    
+    // Checkout
+    document.getElementById('checkout-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const cart = getCart();
+        if (cart.length === 0) {
+            alert('Giỏ hàng trống!');
+            return;
+        }
+        
+        const receiver = document.getElementById('receiver').value;
+        const address = document.getElementById('address').value;
+        const phone = document.getElementById('phone').value;
+        
+        // Prepare cart items for backend
+        const cartItems = cart.map(item => ({
+            product_size_id: item.product_size_id,
+            quantity: item.quantity
+        }));
+        
+        try {
+            const response = await fetch('{% url "cart:checkout" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    cart_items: cartItems,
+                    receiver: receiver,
+                    address: address,
+                    phone: phone
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(data.message);
+                // Clear cart
+                localStorage.removeItem(CART_KEY);
+                window.location.href = '{% url "home" %}';
+            } else {
+                alert('Lỗi: ' + data.error);
+            }
+        } catch (error) {
+            alert('Đã xảy ra lỗi khi đặt hàng!');
+            console.error(error);
+        }
+    });
+    
+    // Initial load
+    updateCartDisplay();
+</script>
+{% endblock %}

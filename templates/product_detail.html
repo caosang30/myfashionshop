@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} - FashionShop{% endblock %}
+
+{% block css %}
+<style>
+    .product-detail-container {
+        max-width: 1200px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+    
+    .product-detail {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .product-image {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 8px;
+    }
+    
+    .product-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .product-category {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+    
+    .product-price {
+        font-size: 28px;
+        color: #e74c3c;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+    
+    .size-selection {
+        margin-bottom: 30px;
+    }
+    
+    .size-label {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: block;
+    }
+    
+    .size-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .size-option {
+        padding: 10px 20px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+    }
+    
+    .size-option:hover {
+        border-color: #3498db;
+    }
+    
+    .size-option.selected {
+        border-color: #3498db;
+        background: #3498db;
+        color: white;
+    }
+    
+    .add-to-cart-btn {
+        padding: 15px 30px;
+        background: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .add-to-cart-btn:hover {
+        background: #229954;
+    }
+    
+    .add-to-cart-btn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #3498db;
+        text-decoration: none;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+        .product-detail {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <a href="{% url 'home' %}" class="back-link">← Quay lại</a>
+    
+    <div class="product-detail">
+        <div>
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+        </div>
+        
+        <div class="product-info">
+            <h1 class="product-title">{{ product.name }}</h1>
+            <p class="product-category">Danh mục: {{ product.category.name }}</p>
+            <p class="product-price">{{ product.formatted_price }}</p>
+            
+            {% if product_sizes %}
+            <div class="size-selection">
+                <label class="size-label">Chọn size:</label>
+                <div class="size-options">
+                    {% for ps in product_sizes %}
+                    <button class="size-option" 
+                            data-product-size-id="{{ ps.id }}"
+                            data-size-name="{{ ps.size.name }}"
+                            onclick="selectSize(this)">
+                        {{ ps.size.name }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <button class="add-to-cart-btn" id="add-to-cart-btn" onclick="addToCartFromDetail()" disabled>
+                Thêm vào giỏ hàng
+            </button>
+            {% else %}
+            <p style="color: #e74c3c;">Sản phẩm hiện không có size nào.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedProductSizeId = null;
+    let selectedSizeName = null;
+    
+    function selectSize(element) {
+        // Remove selected class from all options
+        document.querySelectorAll('.size-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        element.classList.add('selected');
+        
+        // Store selected size info
+        selectedProductSizeId = element.dataset.productSizeId;
+        selectedSizeName = element.dataset.sizeName;
+        
+        // Enable add to cart button
+        document.getElementById('add-to-cart-btn').disabled = false;
+    }
+    
+    function addToCartFromDetail() {
+        if (!selectedProductSizeId) {
+            alert('Vui lòng chọn size!');
+            return;
+        }
+        
+        const productName = "{{ product.name }}";
+        const productPrice = {{ product.price }};
+        const productImage = "{{ product.image.url }}";
+        
+        addToCart(
+            parseInt(selectedProductSizeId),
+            productName,
+            productPrice,
+            productImage,
+            selectedSizeName
+        );
+    }
+</script>
+{% endblock %}

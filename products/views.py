@@ -19,7 +19,11 @@ def product_list(request):
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    return render(request, 'products/product_detail.html', {'product': product})
+    product_sizes = product.productsize_set.select_related('size').all()
+    return render(request, 'product_detail.html', {
+        'product': product,
+        'product_sizes': product_sizes
+    })
 
 def product_by_category(request, category_id):
     categories = Category.objects.filter(hide=False)

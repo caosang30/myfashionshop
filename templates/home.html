@@ -70,12 +70,14 @@
         <ul class="list__product__container">
             {% for product in products %}
                 <li class="product__item">
-                    <div class="product__item__wrap">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
-                        <h3 class="product__name">{{ product.name }}</h3>
-                        <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
-                        <span class="product__price">Giá: {{ product.formatted_price }}</p>
-                    </div>
+                    <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+                        <div class="product__item__wrap">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
+                            <h3 class="product__name">{{ product.name }}</h3>
+                            <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
+                            <span class="product__price">Giá: {{ product.formatted_price }}</p>
+                        </div>
+                    </a>
                 </li>
             {% empty %}
                 <p>Không có sản phẩm nào.</p>
