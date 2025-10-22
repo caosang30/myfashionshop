@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Product, Category
+from django.http import JsonResponse
+from .models import Product, Category, ProductSize
 from django.db.models import Q
 def product_list(request):
     categories = Category.objects.filter(hide=False)
@@ -30,3 +31,14 @@ def product_by_category(request, category_id):
         'products': products,
         'active_category': category.id,
     })
+
+
+def product_sizes(request, product_id):
+    # JSON API: sizes available for a product
+    sizes = (
+        ProductSize.objects.filter(product_id=product_id)
+        .select_related('size')
+        .values('size_id', 'size__name')
+    )
+    data = {'sizes': [{'id': s['size_id'], 'name': s['size__name']} for s in sizes]}
+    return JsonResponse(data)

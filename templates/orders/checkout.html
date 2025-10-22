@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Thanh toán{% endblock %}
+
+{% block content %}
+<section class="content">
+  <h2>Thông tin đơn hàng</h2>
+  <form id="checkout-form" method="post" action="{% url 'checkout' %}">
+    {% csrf_token %}
+    <div style="display:flex; gap:24px; flex-wrap:wrap">
+      <div style="flex:1; min-width:280px">
+        <label>Người nhận</label>
+        <input name="receiver" required style="width:100%; padding:10px"/>
+        <label>Điạ chỉ</label>
+        <input name="address" required style="width:100%; padding:10px"/>
+        <label>Điện thoại</label>
+        <input name="phone" required style="width:100%; padding:10px"/>
+        <input type="hidden" name="items_json" id="items_json"/>
+      </div>
+      <div style="flex:2; min-width:320px">
+        <h3>Giỏ hàng</h3>
+        <table id="cart-table" class="cart-table" style="width:100%">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th>Size</th>
+              <th>Giá</th>
+              <th>Số lượng</th>
+              <th>Tạm tính</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="text-align:right"><strong>Tổng:</strong></td>
+              <td id="cart-total">0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end">
+      <a class="btn secondary" href="{% url 'cart' %}">Quay lại giỏ</a>
+      <button class="btn" type="submit">Đặt hàng</button>
+    </div>
+  </form>
+</section>
+
+<script src="{% static 'js/cart.js' %}"></script>
+<script>
+  // Render readonly cart
+  window.CartUI.renderCartTable({ allowEdit: false });
+  const form = document.getElementById('checkout-form');
+  form.addEventListener('submit', function(e) {
+     const items = window.Cart.getItems();
+     if (!items.length) {
+        e.preventDefault();
+        alert('Giỏ hàng trống.');
+        return;
+     }
+     document.getElementById('items_json').value = JSON.stringify(items);
+  });
+</script>
+{% endblock %}
+

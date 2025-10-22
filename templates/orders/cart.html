@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Giỏ hàng{% endblock %}
+
+{% block css %}
+<style>
+  .cart-table { width: 100%; border-collapse: collapse; }
+  .cart-table th, .cart-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+  .cart-empty { padding: 40px 0; text-align: center; color: #888; }
+  .cart-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+  .btn { padding: 10px 16px; background: #222; color: #fff; border: none; cursor: pointer; }
+  .btn.secondary { background: #777; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+  <h2>Giỏ hàng</h2>
+
+  <div id="cart-empty" class="cart-empty" style="display:none">Giỏ hàng trống.</div>
+
+  <table id="cart-table" class="cart-table" style="display:none">
+    <thead>
+      <tr>
+        <th>Sản phẩm</th>
+        <th>Size</th>
+        <th>Giá</th>
+        <th>Số lượng</th>
+        <th>Tạm tính</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align:right"><strong>Tổng:</strong></td>
+        <td id="cart-total">0</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="cart-actions">
+    <button class="btn secondary" id="clear-cart">Xóa giỏ</button>
+    <a class="btn" href="{% url 'checkout' %}">Thanh toán</a>
+  </div>
+</section>
+
+<script src="{% static 'js/cart.js' %}"></script>
+<script>
+  window.CartUI.renderCartTable();
+  document.getElementById('clear-cart').addEventListener('click', () => {
+    window.Cart.clear();
+    window.CartUI.renderCartTable();
+  });
+</script>
+{% endblock %}
+

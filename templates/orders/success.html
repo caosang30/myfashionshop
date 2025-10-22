@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Đặt hàng thành công{% endblock %}
+
+{% block content %}
+<section class="content" style="text-align:center; padding:40px 0">
+  <h2>Cảm ơn bạn đã đặt hàng!</h2>
+  <p>Mã đơn: <strong>#{{ invoice.id }}</strong></p>
+  <p>Tổng thanh toán: <strong>{{ invoice.total|floatformat:0 }} đ</strong></p>
+  <p><a class="btn" href="/">Tiếp tục mua sắm</a></p>
+</section>
+
+<script>
+  // Clear local cart after success page loads
+  try { localStorage.removeItem('fs_cart'); } catch (e) {}
+  try { localStorage.removeItem('fs_cart_count'); } catch (e) {}
+  try { localStorage.removeItem('fs_cart_total'); } catch (e) {}
+  try { localStorage.removeItem('fs_cart_product_cache'); } catch (e) {}
+  try { localStorage.removeItem('fs_cart_size_cache'); } catch (e) {}
+</script>
+{% endblock %}
+

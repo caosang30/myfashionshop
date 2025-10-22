@@ -73,8 +73,21 @@
                     <div class="product__item__wrap">
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
                         <h3 class="product__name">{{ product.name }}</h3>
-                        <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
-                        <span class="product__price">Giá: {{ product.formatted_price }}</p>
+                        <h3 class="product__category">Danh mục: {{ product.category.name }}</h3>
+                        <span class="product__price">Giá: {{ product.formatted_price }}</span>
+
+                        <div class="row" style="margin-top:8px; gap:8px; align-items:center">
+                            <select class="size-select" data-product-id="{{ product.id }}">
+                                <option value="" disabled selected>Chọn size</option>
+                            </select>
+                            <input type="number" min="1" value="1" class="qty-input" style="width:64px">
+                            <button class="btn add-to-cart"
+                              data-product-id="{{ product.id }}"
+                              data-product-name="{{ product.name }}"
+                              data-product-price="{{ product.price }}"
+                              data-image-url="{{ product.image.url }}"
+                            >Thêm vào giỏ</button>
+                        </div>
                     </div>
                 </li>
             {% empty %}
@@ -91,5 +104,45 @@
             {% endfor %}
         </script>
     {% endif %}
+
+    <script>
+      // Populate size dropdowns and bind add-to-cart
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.size-select').forEach(function(sel) {
+          const productId = sel.getAttribute('data-product-id');
+          fetch(`/products/${productId}/sizes/`)
+            .then(r => r.json())
+            .then(data => {
+              (data.sizes || []).forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id; opt.textContent = s.name;
+                sel.appendChild(opt);
+              });
+            }).catch(()=>{});
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            const card = btn.closest('.product__item__wrap');
+            const sizeSelect = card.querySelector('.size-select');
+            const qtyInput = card.querySelector('.qty-input');
+            const sizeId = Number(sizeSelect.value || 0);
+            const sizeName = sizeSelect.options[sizeSelect.selectedIndex]?.text || '';
+            if (!sizeId) { alert('Vui lòng chọn size'); return; }
+            const product = {
+              productId: Number(btn.getAttribute('data-product-id')), 
+              sizeId: sizeId,
+              name: btn.getAttribute('data-product-name'),
+              sizeName: sizeName,
+              price: Number(btn.getAttribute('data-product-price')),
+              imageUrl: btn.getAttribute('data-image-url'),
+              quantity: Number(qtyInput.value || 1)
+            };
+            window.Cart.addItem(product);
+            alert('Đã thêm vào giỏ');
+          });
+        });
+      });
+    </script>
 
 {% endblock %}
