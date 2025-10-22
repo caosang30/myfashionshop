@@ -73,8 +73,23 @@
                     <div class="product__item__wrap">
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
                         <h3 class="product__name">{{ product.name }}</h3>
-                        <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
-                        <span class="product__price">Giá: {{ product.formatted_price }}</p>
+                        <h3 class="product__category">Danh mục: {{ product.category.name }}</h3>
+                        <span class="product__price">Giá: {{ product.formatted_price }}</span>
+                        <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                            <select class="size-select" data-product-id="{{ product.id }}">
+                                <option value="">Chọn size (tuỳ chọn)</option>
+                                {% for ps in product.productsize_set.all %}
+                                    <option value="{{ ps.size.id }}">{{ ps.size.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button
+                                class="btn add-to-cart-btn"
+                                data-product-id="{{ product.id }}"
+                                data-product-name="{{ product.name }}"
+                                data-product-price="{{ product.price }}"
+                                data-product-image="{{ product.image.url }}"
+                            >Thêm vào giỏ</button>
+                        </div>
                     </div>
                 </li>
             {% empty %}
@@ -92,4 +107,10 @@
         </script>
     {% endif %}
 
+<script src="{% static 'js/cart.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CartUI.mount({ quantityBadgeSelector: '.cart-quantity-text' });
+  });
+</script>
 {% endblock %}

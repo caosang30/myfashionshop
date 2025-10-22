@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Giỏ hàng{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="content" style="padding: 24px; max-width: 960px; margin: 0 auto;">
+  <h2>Giỏ hàng</h2>
+  <div id="cart-container">
+    <table id="cart-table" style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left; padding: 8px; border-bottom: 1px solid #ddd;">Sản phẩm</th>
+          <th style="padding: 8px; border-bottom: 1px solid #ddd;">Size</th>
+          <th style="padding: 8px; border-bottom: 1px solid #ddd;">Giá</th>
+          <th style="padding: 8px; border-bottom: 1px solid #ddd;">Số lượng</th>
+          <th style="padding: 8px; border-bottom: 1px solid #ddd;">Tạm tính</th>
+          <th style="padding: 8px; border-bottom: 1px solid #ddd;">Xóa</th>
+        </tr>
+      </thead>
+      <tbody id="cart-body"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" style="text-align:right; padding: 12px 8px;">Tổng tiền:</td>
+          <td id="cart-total" style="font-weight: 600; padding: 12px 8px;">0</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <h3 style="margin-top: 32px;">Thông tin nhận hàng</h3>
+  {% if not user.is_authenticated %}
+  <p>Vui lòng <a href="{% url 'login' %}">đăng nhập</a> để đặt hàng.</p>
+  {% endif %}
+  <form id="checkout-form" {% if not user.is_authenticated %}class="disabled"{% endif %}>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div>
+        <label>Người nhận</label>
+        <input type="text" name="receiver" id="receiver" class="form-input" required />
+      </div>
+      <div>
+        <label>Số điện thoại</label>
+        <input type="text" name="phone" id="phone" class="form-input" required />
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label>Địa chỉ</label>
+        <input type="text" name="address" id="address" class="form-input" required />
+      </div>
+    </div>
+    <button type="submit" class="btn" style="margin-top:16px;">Đặt hàng</button>
+  </form>
+</section>
+
+<script src="{% static 'js/cart.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    CartUI.mount({
+      tbodySelector: '#cart-body',
+      totalSelector: '#cart-total',
+      quantityBadgeSelector: '.cart-quantity-text',
+    });
+
+    const form = document.getElementById('checkout-form');
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const cart = CartStore.get();
+      if (cart.items.length === 0) { alert('Giỏ hàng trống'); return; }
+
+      const payload = {
+        receiver: document.getElementById('receiver').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        items: cart.items.map(i => ({ product_id: i.product_id, size_id: i.size_id, quantity: i.quantity }))
+      };
+
+      try {
+        const res = await fetch('{% url 'create_invoice' %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          CartStore.clear();
+          CartUI.refresh();
+          alert('Đặt hàng thành công! Mã đơn: ' + data.invoice_id);
+          window.location.href = '{% url 'home' %}';
+        } else {
+          alert('Có lỗi xảy ra khi đặt hàng');
+        }
+      } catch (err) {
+        alert('Lỗi mạng');
+      }
+    });
+  });
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}
