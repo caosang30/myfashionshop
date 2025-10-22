@@ -45,8 +45,8 @@
                     <span class="user__name"></span>
                     <img src="{% static 'img/user-Img.png' %}" alt="User" class="user__img">
 
-                    <a href="">
-                        <div class="cart-quantity"><span class="cart-quantity-text"></span></div>
+                    <a href="{% url 'cart:cart' %}">
+                        <div class="cart-quantity"><span class="cart-quantity-text" id="cart-count">0</span></div>
                         <img src="{% static 'img/img__cart.png' %}" alt="Cart" class="cart__img">
                     </a>            
 

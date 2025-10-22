@@ -71,10 +71,25 @@
             {% for product in products %}
                 <li class="product__item">
                     <div class="product__item__wrap">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
-                        <h3 class="product__name">{{ product.name }}</h3>
-                        <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
-                        <span class="product__price">Giá: {{ product.formatted_price }}</p>
+                        <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
+                            <h3 class="product__name">{{ product.name }}</h3>
+                            <h3 class="product__category">Danh mục: {{ product.category.name }}</h3>
+                            <span class="product__price">Giá: {{ product.formatted_price }}</span>
+                        </a>
+                        <div class="product__actions" style="margin-top: 10px;">
+                            {% if product.productsize_set.all %}
+                                <select class="product-size-select" data-product-id="{{ product.id }}">
+                                    <option value="">Chọn size</option>
+                                    {% for product_size in product.productsize_set.all %}
+                                        <option value="{{ product_size.size.id }}">{{ product_size.size.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="add-to-cart-btn" data-product-id="{{ product.id }}" disabled>Thêm vào giỏ</button>
+                            {% else %}
+                                <span style="color: #999;">Không có size</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </li>
             {% empty %}
@@ -91,5 +106,85 @@
             {% endfor %}
         </script>
     {% endif %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle size selection
+        const sizeSelects = document.querySelectorAll('.product-size-select');
+        sizeSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                const productId = this.dataset.productId;
+                const addButton = document.querySelector(`.add-to-cart-btn[data-product-id="${productId}"]`);
+                
+                if (this.value) {
+                    addButton.disabled = false;
+                } else {
+                    addButton.disabled = true;
+                }
+            });
+        });
+        
+        // Handle add to cart
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = parseInt(this.dataset.productId);
+                const sizeSelect = document.querySelector(`.product-size-select[data-product-id="${productId}"]`);
+                const sizeId = parseInt(sizeSelect.value);
+                
+                if (!sizeId) {
+                    alert('Vui lòng chọn size!');
+                    return;
+                }
+                
+                // Get existing cart or create new one
+                let cart = JSON.parse(localStorage.getItem('fashion_cart') || '{"items": []}');
+                
+                // Check if item already exists in cart
+                const existingItemIndex = cart.items.findIndex(item => 
+                    item.product_id === productId && item.size_id === sizeId
+                );
+                
+                if (existingItemIndex !== -1) {
+                    // Update quantity of existing item
+                    cart.items[existingItemIndex].quantity += 1;
+                } else {
+                    // Add new item to cart
+                    cart.items.push({
+                        product_id: productId,
+                        size_id: sizeId,
+                        quantity: 1
+                    });
+                }
+                
+                // Save cart to localStorage
+                localStorage.setItem('fashion_cart', JSON.stringify(cart));
+                
+                // Update cart count
+                updateCartCount();
+                
+                // Show success message
+                alert('Đã thêm sản phẩm vào giỏ hàng!');
+                
+                // Reset size selection
+                sizeSelect.value = '';
+                this.disabled = true;
+            });
+        });
+        
+        // Function to update cart count in navbar
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('fashion_cart') || '{"items": []}');
+            const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
+        }
+        
+        // Initialize cart count on page load
+        updateCartCount();
+    });
+    </script>
 
 {% endblock %}

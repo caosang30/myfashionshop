@@ -42,6 +42,24 @@
 
     <!-- Footer -->
     {% include "partials/footer.html" %}
+    
+    <!-- Global cart count initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to update cart count in navbar
+            function updateCartCount() {
+                const cart = JSON.parse(localStorage.getItem('fashion_cart') || '{"items": []}');
+                const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+                const cartCountElement = document.getElementById('cart-count');
+                if (cartCountElement) {
+                    cartCountElement.textContent = totalItems;
+                }
+            }
+            
+            // Initialize cart count on page load
+            updateCartCount();
+        });
+    </script>
 </body>
 
 </html>

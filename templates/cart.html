@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Giỏ hàng - FashionShop{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .cart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .cart-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .cart-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .cart-items {
+            margin-bottom: 30px;
+        }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+            margin-right: 15px;
+        }
+        
+        .cart-item-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-size {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-price {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .quantity-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-btn:hover {
+            background: #2980b9;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            margin: 0 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+        
+        .cart-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .cart-total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: right;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+        
+        .cart-actions {
+            text-align: center;
+        }
+        
+        .btn-checkout {
+            background: #27ae60;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .btn-checkout:hover {
+            background: #229954;
+        }
+        
+        .btn-continue {
+            background: #3498db;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-continue:hover {
+            background: #2980b9;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .empty-cart h2 {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .add-to-cart-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .add-to-cart-btn:hover {
+            background: #229954;
+        }
+        
+        .product-size-select {
+            margin-left: 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Giỏ hàng của bạn</h1>
+        <p>Quản lý các sản phẩm trong giỏ hàng</p>
+    </div>
+    
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    
+    <div id="cart-content">
+        <div id="cart-items" class="cart-items">
+            <!-- Cart items will be loaded here by JavaScript -->
+        </div>
+        
+        <div id="cart-summary" class="cart-summary" style="display: none;">
+            <div class="cart-total">
+                Tổng cộng: <span id="cart-total-amount">0đ</span>
+            </div>
+            <div class="cart-actions">
+                <button id="checkout-btn" class="btn-checkout">Thanh toán</button>
+                <a href="{% url 'home' %}" class="btn-continue">Tiếp tục mua sắm</a>
+            </div>
+        </div>
+        
+        <div id="empty-cart" class="empty-cart">
+            <h2>Giỏ hàng của bạn đang trống</h2>
+            <p>Hãy thêm một số sản phẩm vào giỏ hàng để tiếp tục</p>
+            <a href="{% url 'home' %}" class="btn-continue">Mua sắm ngay</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Cart management using localStorage
+class CartManager {
+    constructor() {
+        this.cart = this.getCart();
+        this.loadCartItems();
+        this.updateCartDisplay();
+    }
+    
+    getCart() {
+        const cart = localStorage.getItem('fashion_cart');
+        return cart ? JSON.parse(cart) : { items: [] };
+    }
+    
+    saveCart() {
+        localStorage.setItem('fashion_cart', JSON.stringify(this.cart));
+        this.updateCartCount();
+    }
+    
+    updateCartCount() {
+        const totalItems = this.cart.items.reduce((sum, item) => sum + item.quantity, 0);
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = totalItems;
+        }
+    }
+    
+    async loadCartItems() {
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartSummary = document.getElementById('cart-summary');
+        const emptyCart = document.getElementById('empty-cart');
+        
+        if (this.cart.items.length === 0) {
+            cartItemsContainer.innerHTML = '';
+            cartSummary.style.display = 'none';
+            emptyCart.style.display = 'block';
+            return;
+        }
+        
+        emptyCart.style.display = 'none';
+        cartSummary.style.display = 'block';
+        
+        let html = '';
+        let total = 0;
+        
+        for (const item of this.cart.items) {
+            try {
+                const productInfo = await this.getProductInfo(item.product_id, item.size_id);
+                if (productInfo.success) {
+                    const itemTotal = productInfo.product.price * item.quantity;
+                    total += itemTotal;
+                    
+                    html += `
+                        <div class="cart-item" data-product-id="${item.product_id}" data-size-id="${item.size_id || ''}">
+                            <img src="${productInfo.product.image || '/static/img/placeholder.jpg'}" alt="${productInfo.product.name}" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${productInfo.product.name}</div>
+                                ${productInfo.size ? `<div class="cart-item-size">Size: ${productInfo.size.name}</div>` : ''}
+                                <div class="cart-item-price">${productInfo.product.formatted_price}</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="cartManager.updateQuantity(${item.product_id}, ${item.size_id || 'null'}, ${item.quantity - 1})">-</button>
+                                <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="cartManager.updateQuantity(${item.product_id}, ${item.size_id || 'null'}, this.value)">
+                                <button class="quantity-btn" onclick="cartManager.updateQuantity(${item.product_id}, ${item.size_id || 'null'}, ${item.quantity + 1})">+</button>
+                            </div>
+                            <button class="remove-btn" onclick="cartManager.removeItem(${item.product_id}, ${item.size_id || 'null'})">Xóa</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading product info:', error);
+            }
+        }
+        
+        cartItemsContainer.innerHTML = html;
+        document.getElementById('cart-total-amount').textContent = this.formatPrice(total);
+    }
+    
+    async getProductInfo(productId, sizeId) {
+        const response = await fetch('{% url "cart:get_product_info" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                size_id: sizeId
+            })
+        });
+        return await response.json();
+    }
+    
+    updateQuantity(productId, sizeId, newQuantity) {
+        newQuantity = parseInt(newQuantity);
+        if (newQuantity <= 0) {
+            this.removeItem(productId, sizeId);
+            return;
+        }
+        
+        const itemIndex = this.cart.items.findIndex(item => 
+            item.product_id === productId && item.size_id === sizeId
+        );
+        
+        if (itemIndex !== -1) {
+            this.cart.items[itemIndex].quantity = newQuantity;
+            this.saveCart();
+            this.loadCartItems();
+        }
+    }
+    
+    removeItem(productId, sizeId) {
+        this.cart.items = this.cart.items.filter(item => 
+            !(item.product_id === productId && item.size_id === sizeId)
+        );
+        this.saveCart();
+        this.loadCartItems();
+        this.updateCartDisplay();
+    }
+    
+    updateCartDisplay() {
+        this.updateCartCount();
+    }
+    
+    formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price).replace('₫', 'đ');
+    }
+    
+    async checkout() {
+        if (this.cart.items.length === 0) {
+            alert('Giỏ hàng trống!');
+            return;
+        }
+        
+        try {
+            const response = await fetch('{% url "cart:checkout_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(this.cart)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                window.location.href = result.redirect_url;
+            } else {
+                alert('Lỗi: ' + result.error);
+            }
+        } catch (error) {
+            alert('Có lỗi xảy ra khi thanh toán');
+            console.error('Checkout error:', error);
+        }
+    }
+}
+
+// Initialize cart manager
+let cartManager;
+document.addEventListener('DOMContentLoaded', function() {
+    cartManager = new CartManager();
+    
+    // Checkout button event
+    document.getElementById('checkout-btn').addEventListener('click', function() {
+        {% if user.is_authenticated %}
+            cartManager.checkout();
+        {% else %}
+            alert('Vui lòng đăng nhập để thanh toán');
+            window.location.href = '{% url "login" %}';
+        {% endif %}
+    });
+});
+
+// Global function to add items to cart (can be called from product pages)
+function addToCart(productId, sizeId, quantity = 1) {
+    if (!cartManager) {
+        cartManager = new CartManager();
+    }
+    
+    const existingItemIndex = cartManager.cart.items.findIndex(item => 
+        item.product_id === productId && item.size_id === sizeId
+    );
+    
+    if (existingItemIndex !== -1) {
+        cartManager.cart.items[existingItemIndex].quantity += quantity;
+    } else {
+        cartManager.cart.items.push({
+            product_id: productId,
+            size_id: sizeId,
+            quantity: quantity
+        });
+    }
+    
+    cartManager.saveCart();
+    alert('Đã thêm sản phẩm vào giỏ hàng!');
+}
+</script>
+{% endblock %}
