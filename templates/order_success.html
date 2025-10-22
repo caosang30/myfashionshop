@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đặt hàng thành công{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Đặt hàng thành công!</h2>
+                    <p class="lead">Cảm ơn bạn đã mua sắm tại FashionShop</p>
+                    
+                    <div class="alert alert-info">
+                        <h5>Thông tin đơn hàng</h5>
+                        <p><strong>Mã đơn hàng:</strong> #{{ invoice.id }}</p>
+                        <p><strong>Người nhận:</strong> {{ invoice.receiver }}</p>
+                        <p><strong>Số điện thoại:</strong> {{ invoice.phone }}</p>
+                        <p><strong>Địa chỉ:</strong> {{ invoice.address }}</p>
+                        <p><strong>Tổng tiền:</strong> {{ invoice.total|floatformat:0|add:"đ" }}</p>
+                        <p><strong>Ngày đặt:</strong> {{ invoice.created_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-home"></i> Về trang chủ
+                        </a>
+                        <a href="{% url 'cart:cart' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-shopping-cart"></i> Xem giỏ hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Clear cart after successful order
+document.addEventListener('DOMContentLoaded', function() {
+    localStorage.removeItem('fashion_shop_cart');
+    
+    // Update cart UI if cart manager exists
+    if (window.cartManager) {
+        window.cartManager.clearCart();
+    }
+});
+</script>
+{% endblock %}

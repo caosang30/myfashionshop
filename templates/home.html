@@ -6,6 +6,30 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
+{% block js %}
+    <script src="{% static 'js/cart.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle size selection and enable/disable add to cart button
+            document.querySelectorAll('select[id^="size_"]').forEach(select => {
+                select.addEventListener('change', function() {
+                    const productId = this.id.replace('size_', '');
+                    const sizeId = this.value;
+                    const addToCartBtn = document.querySelector(`button[data-product-id="${productId}"]`);
+                    
+                    if (sizeId) {
+                        addToCartBtn.disabled = false;
+                        addToCartBtn.dataset.sizeId = sizeId;
+                    } else {
+                        addToCartBtn.disabled = true;
+                        addToCartBtn.dataset.sizeId = '';
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
 <!--    <class id="main">
         <div class="heading"></div>
@@ -73,8 +97,28 @@
                     <div class="product__item__wrap">
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200" class="product__img">
                         <h3 class="product__name">{{ product.name }}</h3>
-                        <h3 class="product__category">Danh mục: {{ product.category.name }}</p>
-                        <span class="product__price">Giá: {{ product.formatted_price }}</p>
+                        <h3 class="product__category">Danh mục: {{ product.category.name }}</h3>
+                        <span class="product__price">Giá: {{ product.formatted_price }}</span>
+                        
+                        <!-- Size Selection -->
+                        <div class="product__sizes" style="margin: 10px 0;">
+                            <label for="size_{{ product.id }}">Chọn size:</label>
+                            <select id="size_{{ product.id }}" class="form-control" style="margin: 5px 0;">
+                                <option value="">-- Chọn size --</option>
+                                {% for product_size in product.productsizes.all %}
+                                    <option value="{{ product_size.size.id }}">{{ product_size.size.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Add to Cart Button -->
+                        <button class="btn btn-primary add-to-cart-btn" 
+                                data-product-id="{{ product.id }}" 
+                                data-size-id="" 
+                                style="width: 100%; margin-top: 10px;"
+                                disabled>
+                            Thêm vào giỏ hàng
+                        </button>
                     </div>
                 </li>
             {% empty %}
